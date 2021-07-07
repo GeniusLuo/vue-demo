@@ -2,7 +2,8 @@
   <div id="app">
     <div id="nav">
       <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+      <router-link to="/about">About</router-link> |
+      <router-link to="/animation">Animation</router-link>
     </div>
     <router-view />
     <div id="footer">footer</div>
@@ -10,9 +11,18 @@
 </template>
 
 <style lang="scss">
+html,
+body {
+  height: 100%;
+}
+* {
+  padding: 0;
+  margin: 0;
+}
 #app {
   text-align: center;
   color: #2c3e50;
+  height: 100%;
 }
 
 #nav {
@@ -32,5 +42,8 @@
   text-align: center;
   font-weight: bold;
   color: #2c3e50;
+  position: fixed;
+  bottom: 0;
+  left: 48%;
 }
 </style>
