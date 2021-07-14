@@ -8,26 +8,46 @@
     }"
   >
     <div class="layui-box layui-laypage layui-laypage-default">
-      <a href="javascript:;" v-show="showEnd">
+      <a href="javascript:;" v-show="showEnd" :class="{ 'layui-disabled': current === 1 }">
         <i class="layui-icon layui-icon-prev" v-if="showType === 'icon'" />
         <template v-else>首页</template>
       </a>
-      <a href="javascript:;" class="layui-laypage-prev" data-page="4">
+      <a
+        href="javascript:;"
+        class="layui-laypage-prev"
+        :class="{ 'layui-disabled': current === 1 }"
+      >
         <i class="layui-icon layui-icon-left" v-if="showType === 'icon'"></i>
         <template v-else>上一页</template>
       </a>
-      <a href="javascript:;" :class="[true ? theme : '', true ? 'active' : '']"
-        >1</a
+      <!-- 
+        1. v-for 和 v-if 不能同时在一个dom元素上
+        2. template 不生成标签
+        3. key属性一定要放在真实dom元素上
+       -->
+      <a v-if="pages.length > 5 && current - 2 > 1" href="javascript:;">...</a>
+      <template v-for="(item, index) in pages">
+        <a
+          v-if="item >= current - 2 && item <= current + 2"
+          href="javascript:;"
+          :key="'page' + index"
+          :class="[
+            current - 1 === index ? theme : '',
+            current - 1 === index ? 'active' : '',
+          ]"
+          >{{ item }}</a
+        >
+      </template>
+      <a
+        v-if="pages.length > 5 && current + 2 < pages.length"
+        href="javascript:;"
+        >...</a
       >
-      <a href="javascript:;">2</a>
-      <a href="javascript:;">3</a>
-      <a href="javascript:;">4</a>
-      <a href="javascript:;">5</a>
-      <a href="javascript:;">
+      <a href="javascript:;" :class="{ 'layui-disabled': current === pages.length }">
         <i class="layui-icon layui-icon-right" v-if="showType === 'icon'" />
         <template v-else>下一页</template>
       </a>
-      <a href="javascript:;" class="layui-laypage-next" v-show="showEnd">
+      <a href="javascript:;" class="layui-laypage-next" v-show="showEnd" :class="{ 'layui-disabled': current === pages.length }">
         <i v-if="showType === 'icon'" class="layui-icon layui-icon-next"></i>
         <template v-else>尾页</template>
       </a>
@@ -36,7 +56,7 @@
       到第<input class="input" />页 共 total 页
     </div>
     <div class="selectBox">
-      <select v-model="selectVal">
+      <select v-model.number="selectVal">
         <option v-for="item in options" :key="item">{{ item }}</option>
       </select>
     </div>
@@ -44,6 +64,8 @@
 </template>
 
 <script>
+import _ from "lodash";
+
 export default {
   name: "pagination",
   props: {
@@ -53,11 +75,11 @@ export default {
     },
     showType: {
       type: String,
-      default: "text",
+      default: "icon",
     },
     showEnd: {
       type: Boolean,
-      default: false,
+      default: true,
     },
     theme: {
       type: String,
@@ -71,16 +93,42 @@ export default {
       type: Boolean,
       default: false,
     },
+    total: {
+      type: Number,
+      default: 101,
+    },
+    current: {
+      type: Number,
+      default: 7,
+    },
+    size: {
+      type: Number,
+      default: 15,
+    },
   },
   components: {},
   data() {
     return {
-      options: ['10', '20', '30', '50', '100'],
-      selectVal: '10',
+      options: [10, 20, 30, 50, 100],
+      selectVal: 10,
+      pages: [],
+      limit: 10,
     };
   },
-  mounted() {},
-  methods: {},
+  mounted() {
+    // 初始化分页的长度
+    this.initPages();
+    // 设置select的内容
+    this.limit = this.size;
+    this.options = _.uniq(_.sortBy(_.concat(this.options, this.size)));
+    this.selectVal = this.size;
+  },
+  methods: {
+    initPages() {
+      const len = Math.ceil(this.total / this.size);
+      this.pages = _.range(1, len + 1);
+    },
+  },
 };
 </script>
 
