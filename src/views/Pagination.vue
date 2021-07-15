@@ -8,14 +8,18 @@
     }"
   >
     <div class="layui-box layui-laypage layui-laypage-default">
-      <a href="javascript:;" v-show="showEnd" :class="{ 'layui-disabled': current === 1 }">
+      <a
+        @click.prevent="home"
+        v-show="showEnd"
+        :class="{ 'layui-disabled': current === 1 }"
+      >
         <i class="layui-icon layui-icon-prev" v-if="showType === 'icon'" />
         <template v-else>首页</template>
       </a>
       <a
-        href="javascript:;"
         class="layui-laypage-prev"
         :class="{ 'layui-disabled': current === 1 }"
+        @click.prevent="prev"
       >
         <i class="layui-icon layui-icon-left" v-if="showType === 'icon'"></i>
         <template v-else>上一页</template>
@@ -25,9 +29,15 @@
         2. template 不生成标签
         3. key属性一定要放在真实dom元素上
        -->
-      <a v-if="pages.length > 5 && current - 2 > 1" href="javascript:;">...</a>
+      <a
+        v-if="pages.length > 5 && current - 2 > 1"
+        href="javascript:;"
+        class="layui-disabled"
+        >...</a
+      >
       <template v-for="(item, index) in pages">
         <a
+          @click="change(item)"
           v-if="item >= current - 2 && item <= current + 2"
           href="javascript:;"
           :key="'page' + index"
@@ -41,13 +51,22 @@
       <a
         v-if="pages.length > 5 && current + 2 < pages.length"
         href="javascript:;"
+        class="layui-disabled"
         >...</a
       >
-      <a href="javascript:;" :class="{ 'layui-disabled': current === pages.length }">
+      <a
+        @click.prevent="next"
+        :class="{ 'layui-disabled': current === pages.length }"
+      >
         <i class="layui-icon layui-icon-right" v-if="showType === 'icon'" />
         <template v-else>下一页</template>
       </a>
-      <a href="javascript:;" class="layui-laypage-next" v-show="showEnd" :class="{ 'layui-disabled': current === pages.length }">
+      <a
+        @click.prevent="end"
+        class="layui-laypage-next"
+        v-show="showEnd"
+        :class="{ 'layui-disabled': current === pages.length }"
+      >
         <i v-if="showType === 'icon'" class="layui-icon layui-icon-next"></i>
         <template v-else>尾页</template>
       </a>
@@ -56,7 +75,7 @@
       到第<input class="input" />页 共 total 页
     </div>
     <div class="selectBox">
-      <select v-model.number="selectVal">
+      <select v-model.number="selectVal" @change="selectChange(selectVal)">
         <option v-for="item in options" :key="item">{{ item }}</option>
       </select>
     </div>
@@ -117,16 +136,56 @@ export default {
   },
   mounted() {
     // 初始化分页的长度
+    this.limit = this.size;
     this.initPages();
     // 设置select的内容
-    this.limit = this.size;
-    this.options = _.uniq(_.sortBy(_.concat(this.options, this.size)));
+    this.options = _.uniq(_.sortBy(_.concat(this.options, this.limit)));
     this.selectVal = this.size;
   },
   methods: {
     initPages() {
-      const len = Math.ceil(this.total / this.size);
+      const len = Math.ceil(this.total / this.limit);
       this.pages = _.range(1, len + 1);
+    },
+    selectChange(val) {
+      this.limit = val;
+      this.initPages();
+      let cur = Math.ceil(this.total / this.limit);
+      this.$emit("changeCurrent", cur);
+    },
+    home() {
+      this.$emit("changeCurrent", 1);
+    },
+    end() {
+      this.$emit("changeCurrent", this.pages.length);
+    },
+    prev() {
+      let cur = 1;
+      if (this.current - 1 <= 0) {
+        cur = 1;
+      } else {
+        cur = this.current - 1;
+      }
+      this.$emit("changeCurrent", cur);
+    },
+    next() {
+      let cur = 1;
+      if (this.current >= this.pages.length) {
+        cur = this.pages.length;
+      } else {
+        cur = this.current + 1;
+      }
+      this.$emit("changeCurrent", cur);
+    },
+    change(val) {
+      this.$emit("changeCurrent", val);
+    },
+  },
+  watch: {
+    total(newVal, oldVal) {
+      if (newVal !== oldVal) {
+        this.initPages();
+      }
     },
   },
 };
