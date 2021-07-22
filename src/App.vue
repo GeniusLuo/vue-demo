@@ -4,7 +4,8 @@
       <router-link to="/">Home</router-link> |
       <router-link to="/about">About</router-link> |
       <router-link to="/animation">Animation</router-link> |
-      <router-link to="/pagination">分页组件</router-link>
+      <router-link to="/pagination">分页组件</router-link> |
+      <router-link to="/scroll">滚动动画</router-link>
     </div>
     <router-view />
     <div id="footer">footer</div>
@@ -45,7 +46,10 @@ body {
   color: #2c3e50;
   position: fixed;
   bottom: 0;
-  left: 48%;
+  width: 100%;
+  height: 30px;
+  line-height: 30px;
+  background-color: #fff;
 }
 
 .text-center {

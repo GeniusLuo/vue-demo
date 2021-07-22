@@ -4,6 +4,7 @@ const Home = () => import(/* webpackChunkName: "home" */ '../views/Home.vue')
 const About = () => import(/* webpackChunkName: "about" */ '../views/About.vue')
 const Animation = () => import(/* webpackChunkName: "animation" */ '../views/Animation.vue')
 const Pagination = () => import(/* webpackChunkName: "pagination" */ '../views/Pagination.vue')
+const Scroll = () => import(/* webpackChunkName: "scroll" */ '../views/Scroll.vue')
 
 Vue.use(VueRouter)
 
@@ -24,9 +25,14 @@ const routes = [
     component: Animation
   },
   {
-    path: '/Pagination',
+    path: '/pagination',
     name: 'Pagination',
     component: Pagination
+  },
+  {
+    path: '/scroll',
+    name: 'Scroll',
+    component: Scroll
   }
 ]
 
